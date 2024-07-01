@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 // import 'index.html' as html;
-// const data = fs.readFileSync('file.txt', 'utf8');
+const html = fs.readFileSync('index.html', 'utf8');
 
 // console.log('File before:', data);
 
@@ -50,31 +50,25 @@ app.use(express.json());
 app.get('/',(req,res)=>{
     res.send('<h1>Express server</h1>');
 })
-// const server = http.createServer((req,res)=>{
-//     res.setHeader('Content-Type','text/html');
-//     res.write(`
-//         <!DOCTYPE html>
-//         <html lang="en">
-//         <head>
-//             <meta charset="UTF-8">
-//             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//             <title>Node server</title>
-//         </head>
-//         <body>
-//         <h1>Namaskar Dunia</h1>
-//         </body>
-//         </html>
-//         `);
-//     res.end();
-// });
+const loginHtml = fs.readFileSync('login.html','utf8');
+const server = http.createServer((req,res)=>{
+    res.setHeader('Content-Type','text/html');
+    if(req.url === '/'){
+    res.write(html);
+    res.end();
+    }
+    else if(req.url === '/login'){
+        res.write(loginHtml);
+        res.end();}
+});
 
-app.get('/login',(req,res)=>{
-    res.send('<h1>Login page</h1>');
-})
+// app.get('/login',(req,res)=>{
+//     res.send('<h1>Login page</h1>');
+// })
 const port = 2525;
 
 const host = 'localhost';
 
-app.listen(port,host,()=>{
+server.listen(port,host,()=>{
     console.log(`Server running at http://${host}:${port}`);
 })
