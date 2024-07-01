@@ -44,28 +44,37 @@ const path = require('path');
 // })
 
 const http = require('http');
-const server = http.createServer((req,res)=>{
-    res.setHeader('Content-Type','text/html');
-    res.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Node server</title>
-        </head>
-        <body>
-        <h1>Namaskar Dunia</h1>
-        </body>
-        </html>
-        `);
-    res.end();
-});
+const express = require('express');
+const app = express();
+app.use(express.json());
+app.get('/',(req,res)=>{
+    res.send('<h1>Express server</h1>');
+})
+// const server = http.createServer((req,res)=>{
+//     res.setHeader('Content-Type','text/html');
+//     res.write(`
+//         <!DOCTYPE html>
+//         <html lang="en">
+//         <head>
+//             <meta charset="UTF-8">
+//             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//             <title>Node server</title>
+//         </head>
+//         <body>
+//         <h1>Namaskar Dunia</h1>
+//         </body>
+//         </html>
+//         `);
+//     res.end();
+// });
 
+app.get('/login',(req,res)=>{
+    res.send('<h1>Login page</h1>');
+})
 const port = 2525;
 
 const host = 'localhost';
 
-server.listen(port,host,()=>{
+app.listen(port,host,()=>{
     console.log(`Server running at http://${host}:${port}`);
 })
