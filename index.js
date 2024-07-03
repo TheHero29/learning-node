@@ -22,6 +22,24 @@ app.get('/', (req, res) => {
 
     res.send('Hello World');
 });
+app.delete('/courses/:id', (req, res) => {
+    const course = courses.find(c => c.id === parseInt(req.params.id));
+    if (!course) res.status(404).send('The course with the given ID was not found');
+    const index = courses.indexOf(course);
+    //deleting the course
+    courses.splice(index, 1);
+    res.send(course);
+});
+
+app.put('/courses/:id', (req, res) => {
+    const course = courses.find(c => c.id === parseInt(req.params.id));
+    if (!course) res.status(404).send('The course with the given ID was not found');
+    course.name = req.body.name;
+    const index = courses.indexOf(course);
+    //updating the course
+    courses[index] = course;
+    res.send(course);
+});
 
 app.get('/courses', (req, res) => {
     res.send(courses);
