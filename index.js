@@ -1,9 +1,20 @@
 const express = require('express');
 const app = express();
 const port = 2024;
-
+// const logger = require('./Logger/Logger')
 app.use(express.json());
-
+const Logger = (req,res,next) => {
+    const method = req.method;
+    let ip = req.ip;
+    if(!ip)
+        ip = req.headers['x-forwarded-for']
+    const hostname = req.hostname;
+    const date = new Date().toISOString();
+    // const date = req.date;
+    console.log(`method:69 | IP:${ip} | hostname:${hostname} | date:${date}`);
+    next();
+} 
+app.use(Logger);
 let courses = [
     {
         id: 1,
@@ -34,10 +45,10 @@ app.delete('/courses/:id', (req, res) => {
 app.put('/courses/:id', (req, res) => {
     const course = courses.find(c => c.id === parseInt(req.params.id));
     if (!course) res.status(404).send('The course with the given ID was not found');
-    course.name = req.body.name;
-    const index = courses.indexOf(course);
     //updating the course
-    courses[index] = course;
+    course.name = req.body.name;
+    // const index = courses.indexOf(course);
+    // courses[index] = course;
     res.send(course);
 });
 
