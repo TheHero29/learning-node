@@ -1,8 +1,10 @@
 const express = require('express');
+const fs = require('fs').promises;
 const app = express();
 const port = 2024;
 // const logger = require('./Logger/Logger')
 app.use(express.json());
+
 const Logger = (req,res,next) => {
     const method = req.method;
     let ip = req.ip;
@@ -15,24 +17,36 @@ const Logger = (req,res,next) => {
     next();
 } 
 app.use(Logger);
-let courses = [
-    {
-        id: 1,
-        name: 'course1'
-    },
-    {
-        id: 2,
-        name: 'course2'
-    },
-    {
-        id: 3,
-        name: 'course3'
+
+//getting from file
+
+async function readFile() {
+    try {
+       const data = await fs.readFile('Courses.json', 'utf8');
+       return data;
+    } catch (err) {
+        console.error(err);
     }
-];
+}
+async function writeFile(newdata) {
+    try {
+        // console.log('File content:', data.concat(newdata));
+        await fs.writeFile('Courses.json',newdata)
+    } catch (err) {
+        console.error(err);
+    }
+}
+let courses = [];
+readFile().then((data)=>{
+    courses = JSON.parse(data.toString());
+    // JSON.parse(data.toString());
+});
+
 app.get('/', (req, res) => {
 
     res.send('Hello World');
 });
+
 app.delete('/courses/:id', (req, res) => {
     const course = courses.find(c => c.id === parseInt(req.params.id));
     if (!course) res.status(404).send('The course with the given ID was not found');
@@ -47,8 +61,6 @@ app.put('/courses/:id', (req, res) => {
     if (!course) res.status(404).send('The course with the given ID was not found');
     //updating the course
     course.name = req.body.name;
-    // const index = courses.indexOf(course);
-    // courses[index] = course;
     res.send(course);
 });
 
@@ -66,6 +78,8 @@ app.post('/courses', (req, res) => {
     courses.push(course);
     res.send(course);
 });
+
+writeFile(courses);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

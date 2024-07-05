@@ -1,5 +1,5 @@
- import {promises as fs} from 'fs';
-// const fs = require('fs').promises;
+// import {promises as fs} from 'fs';
+const fs = require('fs').promises;
 async function readFile() {
     try {
        const data = await fs.readFile('file.txt', 'utf8');
