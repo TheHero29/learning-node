@@ -43,6 +43,37 @@ const productModel = mongoose.model("products", productSchema);
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
+app.get("/api/products", async (req, res) => {
+    const products = await productModel.find();
+    res.send(products);
+}
+);
+app.delete("/api/products/:id", async (req, res) => {
+    const product = await productModel.deleteOne({_id:req.params.id});
+    if (!product)
+        return res.status(404).send("Product with given ID not found");
+    res.send(product);
+}
+);
+app.put("/api/products/:id", async (req, res) => {
+    const product = await productModel.updateOne(
+        { _id: req.params.id },
+        {
+            $set: {
+                product_name: req.body.product_name,
+                price: req.body.price,
+                isInStock: req.body.isInStock,
+                description: req.body.description,
+                category: req.body.category,
+                image: req.body.image,
+            },
+        }
+    );
+    if (!product)
+        return res.status(404).send("Product with given ID not found");
+    res.send(product);
+}
+);
 app.post("/api/products", async (req, res) => {
     const body = req.body;
     const product = productModel.create({
