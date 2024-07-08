@@ -11,7 +11,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.error("Failed to connect to MongoDB...", err));
 
-app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api', require('./routes/apiRouter'));
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
