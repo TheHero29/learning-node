@@ -1,14 +1,13 @@
 const express = require("express");
 const app = express();
 const port = 3001;
+require('dotenv').config();
 //b1rvziMCi08qfFh0
 //middleware which parses the incoming request into json
 app.use(express.json());
 const mongoose = require("mongoose");
 mongoose
-  .connect(
-    "mongodb+srv://loukikthatte01:b1rvziMCi08qfFh0@cluster0.lvpssvp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-  )
+  .connect(process.env.MONGO_URL)
   .then(() => console.log("Connected to MongoDB..."))
   .catch((err) => console.error("Failed to connect to MongoDB...", err));
 
@@ -44,37 +43,70 @@ app.get("/", (req, res) => {
   res.send("Hello World");
 });
 app.get("/api/products", async (req, res) => {
-    const products = await productModel.find();
+  try{
+    const products = await productModel.find({});
+    if (!products)
+    return res.status(404).send("NO products available");
     res.send(products);
+  }
+  catch(err){
+    return res.status(404).send("error in fetching products");
+  }
+    
+}
+);
+app.get("/api/products/:id", async (req, res) => {
+    try{
+      const product = await productModel.findById({_id:req.params.id});
+      if (!product)
+      return res.status(404).send("Product with given ID not found");
+      res.send(product);
+    }
+    catch(err){
+      return res.status(404).send("Product with given ID not found");
+    }
+    
 }
 );
 app.delete("/api/products/:id", async (req, res) => {
+  try{
     const product = await productModel.deleteOne({_id:req.params.id});
     if (!product)
         return res.status(404).send("Product with given ID not found");
     res.send(product);
+  }
+  catch(err){
+    return res.status(404).send("Product with given ID not found");
+  } 
 }
 );
 app.put("/api/products/:id", async (req, res) => {
-    const product = await productModel.updateOne(
-        { _id: req.params.id },
-        {
-            $set: {
-                product_name: req.body.product_name,
-                price: req.body.price,
-                isInStock: req.body.isInStock,
-                description: req.body.description,
-                category: req.body.category,
-                image: req.body.image,
-            },
-        }
-    );
+  try{
+    // or we can use findByIdAndUpdate method
+    // updateOne
+    const product = await productModel.findByIdAndUpdate(req.params.id,req.body,{new:true});
+      // {
+      //     $set: {
+      //         product_name: req.body.product_name,
+      //         price: req.body.price,
+      //         isInStock: req.body.isInStock,
+      //         description: req.body.description,
+      //         category: req.body.category,
+      //         image: req.body.image,
+      //     },
+      // }
     if (!product)
-        return res.status(404).send("Product with given ID not found");
+      return res.status(404).send("Product with given ID not found");
     res.send(product);
+  }
+  catch(err){
+    return res.status(404).send("Product with given ID not found");
+  }
+    
 }
 );
 app.post("/api/products", async (req, res) => {
+  try{
     const body = req.body;
     const product = productModel.create({
         product_name: body.product_name,
@@ -83,10 +115,13 @@ app.post("/api/products", async (req, res) => {
         description: body.description,
         category: body.category,
         image: body.image,
-    })
-    // console.log(product);
+    });
     console.log('Product created successfully');
     return res.status(201).json({message:'Product created successfully'});
+  }
+  catch(err){ 
+    return res.status(404).send("Some error occured while creating product");
+  }    
 });
 
 app.listen(port, () => {
